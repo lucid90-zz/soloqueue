@@ -6,8 +6,6 @@
 
 package entities;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.List;
 import java.util.Vector;
 import javax.swing.JProgressBar;

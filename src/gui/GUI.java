@@ -6,7 +6,6 @@
 
 package gui;
 
-import entities.DownloadTask;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -18,6 +17,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import mediator.Mediator;
@@ -70,7 +70,9 @@ public class GUI extends JFrame implements MouseListener{
         downloadsTable = new JTable(downloadsTableModel);
         downloadsTable.getColumnModel().getColumn(3).setCellRenderer(new JProgressBarCellRenderer());
         downloadsTable.setPreferredSize(new Dimension(0, 200));
-        jpFilesDownloads.add(downloadsTable,BorderLayout.SOUTH);
+        JScrollPane jspDT = new JScrollPane(downloadsTable);
+        jspDT.setPreferredSize(new Dimension(0, 200));
+        jpFilesDownloads.add(jspDT,BorderLayout.SOUTH);
         jpFilesDownloads.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
         
         getContentPane().add(jpFilesDownloads, BorderLayout.CENTER);

@@ -6,44 +6,78 @@
 
 package Test;
 
-import entities.User;
-import gui.GUI;
-import java.util.Vector;
+import java.util.List;
+import javax.swing.SwingWorker;
 import mediator.Mediator;
 
 /**
  *
  * @author LucianDobre
  */
-public class TestMock {
-    public void executeTest(){
-        Mediator med = new Mediator();
-        GUI gui = new GUI(med);
-        
-        med.setGui(gui);
-        
-        User u = new User();
-        u.setDisplayName("Lucian");
-        u.setUsername("lucid");
-        u.setPassword("parola");
-        Vector ufiles = new Vector();
-        ufiles.add("Dune.txt");
-        ufiles.add("RAZR.pdf");
-        u.setFiles(ufiles);
-        
-        User me = new User();
-        me.setDisplayName("Valentin");
-        me.setUsername("vale");
-        me.setPassword("password");
-        Vector mefiles = new Vector();
-        mefiles.add("Harry Potter.txt");
-        mefiles.add("Introduction to C++ programming.pdf");
-        me.setFiles(mefiles);
-        med.setLoggedInUser(me);
+public class TestMock  extends SwingWorker<Object, Object>{
+    final int FIRST_USER = 0;
+    final int SECOND_USER = 1;
+    final int FIRST_FILE = 2;
+    final int SECOND_FILE = 3;
+    final int CLOSE = 4;
 
-        med.addUser(u);
-        med.addUser(me);
-        
-        
+    Mediator med;
+    
+    public TestMock(Mediator med) {
+        this.med = med;
     }
+
+    @Override
+    protected Object doInBackground() throws Exception {
+        Thread.sleep(1000);
+        publish(FIRST_USER);
+        Thread.sleep(1000);
+        publish(FIRST_FILE);
+        Thread.sleep(1000);
+        publish(SECOND_FILE);
+        Thread.sleep(1000);
+        publish(SECOND_USER);
+        Thread.sleep(1000);
+        publish(FIRST_FILE);
+        Thread.sleep(1000);
+        publish(SECOND_FILE);
+        Thread.sleep(13000);
+        publish(CLOSE);
+        return null;
+    }
+
+    @Override
+    protected void done() {
+    }
+
+    @Override
+    protected void process(List<Object> chunks) {
+        for ( Object chunk : chunks){
+            switch(((Integer)chunk)){
+                case FIRST_USER:
+                    med.getGui().getUserList().setSelectedIndex(0);
+                    med.setFiles();
+                    break;
+                case SECOND_USER:
+                    med.getGui().getUserList().setSelectedIndex(1);
+                    med.setFiles();
+                    break;
+                case FIRST_FILE:
+                    med.getGui().getFileList().setSelectedIndex(0);
+                    med.addDownloadTaskFromGUI();
+                    break;
+                case SECOND_FILE:
+                    med.getGui().getFileList().setSelectedIndex(1);
+                    med.addDownloadTaskFromGUI();
+                    break;
+                case CLOSE:
+                    med.getGui().dispose();
+                    break;
+                default:
+                    System.out.println("BOGUS PROCESSING REQUEST");
+            }
+        }
+    }
+    
+    
 }
