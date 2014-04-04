@@ -6,6 +6,7 @@
 
 package gui;
 
+import entities.DownloadTask;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -33,7 +34,7 @@ public class GUI extends JFrame implements MouseListener{
     private JList userList;
     private DefaultListModel userListModel;
     
-    private JTable downloadsTable;
+    private  JTable downloadsTable;
     private DefaultTableModel downloadsTableModel;
 
     public GUI(Mediator med){
@@ -65,6 +66,7 @@ public class GUI extends JFrame implements MouseListener{
                 return false;
             }
         };
+        
         downloadsTable = new JTable(downloadsTableModel);
         downloadsTable.getColumnModel().getColumn(3).setCellRenderer(new JProgressBarCellRenderer());
         downloadsTable.setPreferredSize(new Dimension(0, 200));

@@ -8,11 +8,14 @@ package mediator;
 
 import Client.WSClient;
 import entities.DownloadTask;
+import entities.DownloadTaskCompliant;
 import entities.User;
 import gui.GUI;
 import gui.JProgressBarCellRenderer;
 import java.util.ArrayList;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
 import javax.swing.JProgressBar;
 import network.Network;
@@ -71,13 +74,6 @@ public class Mediator {
         this.downloadColumnNames = downloadColumnNames;
     }
     
-    public void addDownloadTask(DownloadTask dt){
-        gui.getDownloadsTableModel().addRow(dt.toVector());
-        
-        /*HERE I WOULD START THE DOWNLOAD JOB*/
-        dt.start();
-    }
-    
     public String getSelectedFilename(){
         return (String)gui.getFileListModel().get(gui.getFileList().getSelectedIndex());
     }
@@ -86,27 +82,34 @@ public class Mediator {
         return users.get(gui.getUserList().getSelectedIndex());
     }
     
+    public void addDownloadTask(DownloadTaskCompliant dt){
+        gui.getDownloadsTableModel().addRow(dt.toVector());
+        
+        /*HERE I WOULD START THE DOWNLOAD JOB*/
+        dt.execute();
+    }
+    
     /*Mediator calls this when gui announces a double-click event on a file*/
     public synchronized void addDownloadTaskFromGUI(){
         String filename = getSelectedFilename();
         User user = getSelectedUser();
         
-        DownloadTask dt = new DownloadTask();
+        DownloadTaskCompliant dt = new DownloadTaskCompliant();
         dt.setMed(this);
         dt.setSource(user.getDisplayName());
         dt.setDestination(loggedInUser.getDisplayName());
         dt.setFileName(filename);
-        dt.setProgress(new JProgressBar());
+        dt.setProgressDone(new JProgressBar());
         dt.setDownloadState(DownloadTask.STATE_RECEIVING);
         
         gui.getDownloadsTableModel().addRow(dt.toVector());
       
         /*HERE I WOULD START THE DOWNLOAD JOB*/
-        dt.start();
+        dt.execute();
     }
     
     /*DownloadTasks call this method to remove themselves from download*/
-    public synchronized void removeDownloadTask(DownloadTask dt){
+    public synchronized void removeDownloadTask(DownloadTaskCompliant dt){
         Vector data = new Vector(gui.getDownloadsTableModel().getDataVector());
         Object toRemove = null;
         for( Object v : data ){

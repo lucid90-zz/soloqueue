@@ -8,24 +8,31 @@ package entities;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.List;
 import java.util.Vector;
 import javax.swing.JProgressBar;
+import javax.swing.SwingWorker;
 import mediator.Mediator;
 
 /**
  *
  * @author LucianDobre
  */
-public class DownloadTask extends Thread{
-    public static final String STATE_SENDING = "UPLOADING";
+public class DownloadTaskCompliant extends SwingWorker<Object, Object>{
+      public static final String STATE_SENDING = "UPLOADING";
     public static final String STATE_RECEIVING = "DOWNLOADING";
     public static final String STATE_COMPLETED = "FINISHED";
     Mediator med;
     String source;
     String destination;
     String fileName;
-    JProgressBar progress;
+    JProgressBar progressDone;
     String downloadState;
+
+    public DownloadTaskCompliant() {
+        progressDone = new JProgressBar(0,100);
+    }
+    
 
     public String getSource() {
         return source;
@@ -51,12 +58,12 @@ public class DownloadTask extends Thread{
         this.fileName = fileName;
     }
 
-    public JProgressBar getProgress() {
-        return progress;
+    public JProgressBar getProgressDone() {
+        return progressDone;
     }
 
-    public void setProgress(JProgressBar progress) {
-        this.progress = progress;
+    public void setProgressDone(JProgressBar progress) {
+        this.progressDone = progress;
     }
 
     public String getDownloadState() {
@@ -76,7 +83,7 @@ public class DownloadTask extends Thread{
     }
     
     public void finishState(){
-        //med.removeDownloadTask(this);
+        med.removeDownloadTask(this);
     }
     
     public Vector toVector(){
@@ -84,32 +91,41 @@ public class DownloadTask extends Thread{
         toReturn.add(source);
         toReturn.add(destination);
         toReturn.add(fileName);
-        toReturn.add(progress);
+        toReturn.add(progressDone);
         toReturn.add(downloadState);
         
         return toReturn;
     }
-    
-    public void run(){
-        progress.addPropertyChangeListener(new PropertyChangeListener() {
 
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                med.getGui().getDownloadsTable().repaint();
-            }
-        });
+    @Override
+    protected Object doInBackground() throws Exception {
         
         for ( int i = 0 ; i < 1000 ; ++i){
             try {
                 Thread.sleep(10);
             } catch (InterruptedException ex) {
             }
-            progress.setValue(i/10);
+            setProgress(i/10);
+            publish(i/10);
         }
         try {
             Thread.sleep(100);
         } catch (InterruptedException ex) {
         }
-        //med.removeDownloadTask(this);
+        return null;
     }
+    
+    @Override
+    protected void done(){
+     med.removeDownloadTask(this);   
+    }
+
+    @Override
+    protected void process(List<Object> chunks) {
+        progressDone.setValue((int)chunks.get(0));
+        med.getGui().getDownloadsTable().repaint();
+        
+    }
+    
+    
 }
