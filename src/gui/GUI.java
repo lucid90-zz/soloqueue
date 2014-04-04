@@ -8,6 +8,9 @@ package gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.Vector;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
@@ -18,7 +21,7 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import mediator.Mediator;
 
-public class GUI extends JFrame{
+public class GUI extends JFrame implements MouseListener{
     
     private Mediator med;
     
@@ -46,12 +49,15 @@ public class GUI extends JFrame{
         fileList = new JList(fileListModel);
         jpFilesDownloads.add(fileList, BorderLayout.NORTH);
         jpFilesDownloads.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
+        fileList.addMouseListener(this);
         
         jpUsers = new JPanel(new BorderLayout());
+        jpUsers.setPreferredSize(new Dimension(100, 0));
         userListModel = new DefaultListModel();
         userList = new JList(userListModel);
         jpUsers.add(userList, BorderLayout.CENTER);
         jpUsers.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
+        userList.addMouseListener(this);
         
         downloadsTableModel = new DefaultTableModel(new Vector(),med.getDownloadColumnNames()){
             @Override
@@ -61,6 +67,7 @@ public class GUI extends JFrame{
         };
         downloadsTable = new JTable(downloadsTableModel);
         downloadsTable.getColumnModel().getColumn(3).setCellRenderer(new JProgressBarCellRenderer());
+        downloadsTable.setPreferredSize(new Dimension(0, 200));
         jpFilesDownloads.add(downloadsTable,BorderLayout.SOUTH);
         jpFilesDownloads.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
         
@@ -103,7 +110,7 @@ public class GUI extends JFrame{
         this.userListModel = userListModel;
     }
 
-    public JTable getDownloadsTable() {
+    public synchronized JTable getDownloadsTable() {
         return downloadsTable;
     }
 
@@ -111,7 +118,7 @@ public class GUI extends JFrame{
         this.downloadsTable = downloadsTable;
     }
 
-    public DefaultTableModel getDownloadsTableModel() {
+    public synchronized DefaultTableModel getDownloadsTableModel() {
         return downloadsTableModel;
     }
 
@@ -126,6 +133,32 @@ public class GUI extends JFrame{
     public void setMed(Mediator med) {
         this.med = med;
     }
-    
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        if ( e.getSource() == userList && e.getClickCount() == 2){
+            med.setFiles();
+        }
+        
+        if ( e.getSource() == fileList && e.getClickCount() == 2){
+            med.addDownloadTaskFromGUI();
+        }
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+    }
     
 }

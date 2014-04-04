@@ -8,15 +8,17 @@ package entities;
 
 import java.util.Vector;
 import javax.swing.JProgressBar;
+import mediator.Mediator;
 
 /**
  *
  * @author LucianDobre
  */
 public class DownloadTask extends Thread{
-    public static final String STATE_SENDING = "send";
-    public static final String STATE_RECEIVING = "receive";
-    public static final String STATE_COMPLETED = "completed";
+    public static final String STATE_SENDING = "UPLOADING";
+    public static final String STATE_RECEIVING = "DOWNLOADING";
+    public static final String STATE_COMPLETED = "FINISHED";
+    Mediator med;
     String source;
     String destination;
     String fileName;
@@ -62,6 +64,18 @@ public class DownloadTask extends Thread{
     public void setDownloadState(String downloadState) {
         this.downloadState = downloadState;
     }
+
+    public Mediator getMed() {
+        return med;
+    }
+
+    public void setMed(Mediator med) {
+        this.med = med;
+    }
+    
+    public void finishState(){
+        med.removeDownloadTask(this);
+    }
     
     public Vector toVector(){
         Vector toReturn = new Vector();
@@ -72,5 +86,43 @@ public class DownloadTask extends Thread{
         toReturn.add(downloadState);
         
         return toReturn;
+    }
+    
+    public void run(){
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException ex) {
+        }
+        progress.setValue(20);
+        med.getGui().getDownloadsTable().repaint();
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException ex) {
+        }
+        progress.setValue(40);
+        med.getGui().getDownloadsTable().repaint();
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException ex) {
+        }
+        progress.setValue(60);
+        med.getGui().getDownloadsTable().repaint();
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException ex) {
+        }
+        progress.setValue(80);
+        med.getGui().getDownloadsTable().repaint();
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException ex) {
+        }
+        progress.setValue(100);
+        med.getGui().getDownloadsTable().repaint();
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException ex) {
+        }
+        med.removeDownloadTask(this);
     }
 }
