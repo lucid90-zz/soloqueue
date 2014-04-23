@@ -19,7 +19,17 @@
     </target>
 
     <target name="run">
-        <java jar="build/jar/Soloq.jar" fork="true"/>
+		<parallel>
+        <java jar="build/jar/Soloq.jar" fork="true">
+		<arg line="gigi 5001 5002"/>
+		</java>
+		<java jar="build/jar/Soloq.jar" fork="true">
+		<arg line="lucian 5000 5002"/>
+		</java>
+		<java jar="build/jar/Soloq.jar" fork="true">
+		<arg line="valentin 5000 5001"/>
+		</java>
+		</parallel>
     </target>
 
 </project>

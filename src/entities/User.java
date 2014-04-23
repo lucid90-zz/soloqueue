@@ -6,17 +6,21 @@
 
 package entities;
 
+import java.io.Serializable;
 import java.util.Vector;
 
 /**
  *
  * @author LucianDobre
  */
-public class User {
+public class User implements Serializable{
     
     private String username;
     private String displayName;
     private String password;
+    private String downloadDirectory;
+    private String hostname;
+    private int port;
     private Vector<String> files;
 
     public String getUsername() {
@@ -50,6 +54,28 @@ public class User {
     public void setFiles(Vector<String> files) {
         this.files = files;
     }
-    
-    
+
+    public String getDownloadDirectory() {
+        return downloadDirectory;
+    }
+
+    public void setDownloadDirectory(String downloadDirectory) {
+        this.downloadDirectory = downloadDirectory;
+    }
+
+    public String getHostname() {
+        return hostname;
+    }
+
+    public void setHostname(String hostname) {
+        this.hostname = hostname;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
 }

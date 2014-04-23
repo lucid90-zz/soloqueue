@@ -6,7 +6,10 @@
 
 package Test;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.SwingWorker;
 import mediator.Mediator;
 
@@ -64,11 +67,23 @@ public class TestMock  extends SwingWorker<Object, Object>{
                     break;
                 case FIRST_FILE:
                     med.getGui().getFileList().setSelectedIndex(0);
-                    med.addDownloadTaskFromGUI();
+            try {
+                med.addDownloadTaskFromGUI();
+            } catch (IOException ex) {
+                Logger.getLogger(TestMock.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(TestMock.class.getName()).log(Level.SEVERE, null, ex);
+            }
                     break;
                 case SECOND_FILE:
                     med.getGui().getFileList().setSelectedIndex(1);
-                    med.addDownloadTaskFromGUI();
+            try {
+                med.addDownloadTaskFromGUI();
+            } catch (IOException ex) {
+                Logger.getLogger(TestMock.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(TestMock.class.getName()).log(Level.SEVERE, null, ex);
+            }
                     break;
                 case CLOSE:
                     med.getGui().dispose();

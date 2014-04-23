@@ -8,7 +8,14 @@ package soloq;
 
 import entities.User;
 import gui.GUI;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.Vector;
+import log.LogFile;
+import log.SimpleLogFile;
+import log.StandardLogger;
 import mediator.Mediator;
 
 /**
@@ -18,34 +25,72 @@ import mediator.Mediator;
 public class Soloq {
 
     public static void main(String[] args) {
-        Mediator med = new Mediator();
-        GUI gui = new GUI(med);
+        SimpleLogFile mediatorLogFile = new SimpleLogFile();
+        mediatorLogFile.init("mediator.log");
+        StandardLogger.addLog("mediator", mediatorLogFile);
         
-        med.setGui(gui);
+        SimpleLogFile networkLogFile = new SimpleLogFile();
+        networkLogFile.init("network.log");
+        StandardLogger.addLog("network", networkLogFile);
         
-        User u = new User();
-        u.setDisplayName("Lucian");
-        u.setUsername("lucid");
-        u.setPassword("parola");
-        Vector ufiles = new Vector();
-        ufiles.add("Dune.txt");
-        ufiles.add("RAZR.pdf");
-        u.setFiles(ufiles);
+        SimpleLogFile guiLogFile = new SimpleLogFile();
+        guiLogFile.init("gui.log");
+        StandardLogger.addLog("gui", guiLogFile);
         
-        User me = new User();
-        me.setDisplayName("Valentin");
-        me.setUsername("vale");
-        me.setPassword("password");
-        Vector mefiles = new Vector();
-        mefiles.add("Harry Potter.txt");
-        mefiles.add("Introduction to C++ programming.pdf");
-        me.setFiles(mefiles);
-        med.setLoggedInUser(me);
+        SimpleLogFile applicationLogFile = new SimpleLogFile();
+        applicationLogFile.init("application.log");
+        StandardLogger.addLog("application", applicationLogFile);
+        
+        try {
+             Mediator med = new Mediator();
+             
+             GUI gui = new GUI(med);
+             med.setGui(gui);
+             
+             network.Network net = new network.Network();
+             net.setMed(med);
+             net.execute();
+             med.setNet(net);
+             
+             /*Read about which users exist*/
+             String loggedInUser = args[0];
+             med.getGui().setTitle(loggedInUser);
+             User u = new User();
+                
+            /*Read their metadata*/
+            RandomAccessFile userMeta = new RandomAccessFile("config/"+loggedInUser+"/_meta","r");
 
-        med.addUser(u);
-        med.addUser(me);
-        
-        new Test.TestMock(med).execute();
+            u.setDownloadDirectory("config/"+loggedInUser+"/");
+            u.setHostname("localhost");
+
+            u.setDisplayName(userMeta.readLine());
+            u.setUsername(loggedInUser);
+            u.setPassword(userMeta.readLine());
+            u.setHostname(userMeta.readLine());
+            u.setPort(Integer.parseInt(userMeta.readLine()));
+
+            /*Add their files*/
+            Vector ufiles = new Vector();
+            File dir= new File("config/"+loggedInUser+"/"), iter;
+
+            for ( String s : dir.list() ){
+                iter = new File("config/"+loggedInUser+"/"+s);
+                if ( !s.startsWith("_") && iter.isFile() )
+                    ufiles.add(iter.getPath());
+            }
+            u.setFiles(ufiles);
+            med.addUser(u);
+            med.setLoggedInUser(u);
+         
+            med.getNet().doConnect("localhost",Integer.parseInt(args[1]));
+            med.getNet().doConnect("localhost",Integer.parseInt(args[2]));
+        } catch (FileNotFoundException ex) {
+            StandardLogger.getLog("application").log(LogFile.SEVERITY_CRIT_ERROR, "Could not open user configuration file");
+        } catch (IOException ioex) {
+            StandardLogger.getLog("application").log(LogFile.SEVERITY_CRIT_ERROR, "Could not read user configuration file");
+        } catch (ClassNotFoundException ex) {
+            StandardLogger.getLog("network").log(LogFile.SEVERITY_CRIT_ERROR, "Could not find class to deserialize response");
+        }
     }
     
 }

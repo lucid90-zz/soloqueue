@@ -11,7 +11,10 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.IOException;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
@@ -145,7 +148,13 @@ public class GUI extends JFrame implements MouseListener{
         }
         
         if ( e.getSource() == fileList && e.getClickCount() == 2){
-            med.addDownloadTaskFromGUI();
+            try {
+                med.addDownloadTaskFromGUI();
+            } catch (IOException ex) {
+                Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 

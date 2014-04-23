@@ -12,11 +12,10 @@ import entities.DownloadTaskCompliant;
 import entities.User;
 import gui.GUI;
 import gui.JProgressBarCellRenderer;
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.DefaultListModel;
 import javax.swing.JProgressBar;
 import network.Network;
 
@@ -24,7 +23,7 @@ import network.Network;
  *
  * @author LucianDobre
  */
-public class Mediator {
+public class Mediator implements Serializable{
     private Vector<String> downloadColumnNames;
     private GUI gui;
     private Network net;
@@ -84,28 +83,13 @@ public class Mediator {
     
     public void addDownloadTask(DownloadTaskCompliant dt){
         gui.getDownloadsTableModel().addRow(dt.toVector());
-        
-        /*HERE I WOULD START THE DOWNLOAD JOB*/
-        dt.execute();
     }
     
     /*Mediator calls this when gui announces a double-click event on a file*/
-    public synchronized void addDownloadTaskFromGUI(){
+    public synchronized void addDownloadTaskFromGUI() throws IOException, ClassNotFoundException{
         String filename = getSelectedFilename();
         User user = getSelectedUser();
-        
-        DownloadTaskCompliant dt = new DownloadTaskCompliant();
-        dt.setMed(this);
-        dt.setSource(user.getDisplayName());
-        dt.setDestination(loggedInUser.getDisplayName());
-        dt.setFileName(filename);
-        dt.setProgressDone(new JProgressBar());
-        dt.setDownloadState(DownloadTask.STATE_RECEIVING);
-        
-        gui.getDownloadsTableModel().addRow(dt.toVector());
-      
-        /*HERE I WOULD START THE DOWNLOAD JOB*/
-        dt.execute();
+        getNet().doDownload(user, filename);
     }
     
     /*DownloadTasks call this method to remove themselves from download*/

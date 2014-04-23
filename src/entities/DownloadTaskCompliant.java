@@ -97,18 +97,17 @@ public class DownloadTaskCompliant extends SwingWorker<Object, Object>{
 
     @Override
     protected Object doInBackground() throws Exception {
+        int iter = 0;
         
-        for ( int i = 0 ; i < 1000 ; ++i){
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException ex) {
+        while ( true ) {          
+            if ( iter < getProgressDone().getValue() ){
+                iter = getProgressDone().getValue();
+                publish(iter);
             }
-            setProgress(i/10);
-            publish(i/10);
-        }
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException ex) {
+            
+            if ( getProgress() > 100)
+                break;
+            
         }
         return null;
     }
