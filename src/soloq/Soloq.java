@@ -6,12 +6,15 @@
 
 package soloq;
 
+import Client.WSClient;
 import entities.User;
 import gui.GUI;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 import log.LogFile;
 import log.SimpleLogFile;
@@ -52,6 +55,8 @@ public class Soloq {
              net.execute();
              med.setNet(net);
              
+             med.setClient(new WSClient());
+             
              /*Read about which users exist*/
              String loggedInUser = args[0];
              med.getGui().setTitle(loggedInUser);
@@ -81,9 +86,24 @@ public class Soloq {
             u.setFiles(ufiles);
             med.addUser(u);
             med.setLoggedInUser(u);
+            
+            /*Get logged in users and files*/
+            List<String> userNames = med.getClient().getSubscribers();
+            
+            for ( String userName : userNames ){
+                u = new User();
+                u.setDisplayName(userName);
+                u.setHostname("localhost");
+                u.setPort(med.getClient().getSubscriberPort(userName));
+                u.setUsername(userName);
+                u.setFiles( new Vector<String>(med.getClient().getSubscriberFiles(userName)) );
+                med.addUser(u);
+                med.getNet().doConnect("localhost",u.getPort());
+            }
+            
+            med.getClient().subscribe(med.getLoggedInUser().getPort(), med.getLoggedInUser().getDisplayName(), med.getLoggedInUser().getFiles());
          
-            med.getNet().doConnect("localhost",Integer.parseInt(args[1]));
-            med.getNet().doConnect("localhost",Integer.parseInt(args[2]));
+            
         } catch (FileNotFoundException ex) {
             StandardLogger.getLog("application").log(LogFile.SEVERITY_CRIT_ERROR, "Could not open user configuration file");
         } catch (IOException ioex) {

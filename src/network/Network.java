@@ -152,11 +152,17 @@ public class Network extends SwingWorker<Object, Object>{
     
     @Override
     protected Object doInBackground(){
+        int iter = 0;
         try {
             serverSocket = ServerSocketChannel.open();
             serverSocket.socket().bind(new InetSocketAddress(med.getLoggedInUser().getHostname(), med.getLoggedInUser().getPort()));
             
             while (listening) {
+                    iter++;
+                    if ( iter / 10000 > 0){
+                        iter = 0 ;
+                        getMed().refreshUsers();
+                    }
                     requestSocket = serverSocket.accept();
                     in = new ObjectInputStream(requestSocket.socket().getInputStream());
                     out = new ObjectOutputStream(requestSocket.socket().getOutputStream());

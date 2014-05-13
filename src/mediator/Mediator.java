@@ -12,9 +12,12 @@ import entities.DownloadTaskCompliant;
 import entities.User;
 import gui.GUI;
 import gui.JProgressBarCellRenderer;
+import java.io.File;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 import javax.swing.JProgressBar;
 import network.Network;
@@ -83,6 +86,38 @@ public class Mediator implements Serializable{
     
     public void addDownloadTask(DownloadTaskCompliant dt){
         gui.getDownloadsTableModel().addRow(dt.toVector());
+    }
+    
+    
+    public void refreshUsers() throws IOException, ClassNotFoundException{
+        /*Read about which users exist*/
+        User u = new User();
+        u.setDownloadDirectory(loggedInUser.getDownloadDirectory());
+        u.setHostname(loggedInUser.getHostname());
+        u.setDisplayName(loggedInUser.getDisplayName());
+        u.setUsername(loggedInUser.getUsername());
+        u.setPassword(loggedInUser.getPassword());
+        u.setHostname(loggedInUser.getHostname());
+        u.setPort(loggedInUser.getPort());
+        u.setFiles(loggedInUser.getFiles());
+        users.clear();
+
+        addUser(u);
+        setLoggedInUser(u);
+
+        /*Get logged in users and files*/
+        List<String> userNames = getClient().getSubscribers();
+
+        for ( String userName : userNames ){
+            u = new User();
+            u.setDisplayName(userName);
+            u.setHostname("localhost");
+            u.setPort(getClient().getSubscriberPort(userName));
+            u.setUsername(userName);
+            u.setFiles( new Vector<String>(getClient().getSubscriberFiles(userName)) );
+            addUser(u);
+            getNet().doConnect("localhost",u.getPort());
+        }
     }
     
     /*Mediator calls this when gui announces a double-click event on a file*/

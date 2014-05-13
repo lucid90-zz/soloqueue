@@ -1,0 +1,38 @@
+import java.util.*;
+
+public class Sharix {
+
+	private static TreeMap< String , List<String> > subscriberFiles = new TreeMap<String,List<String>>();
+	private static TreeMap< String, Integer> subscriberPorts = new TreeMap<String, Integer>();
+	
+	public String subscribe(int port, String subscriber, List<String> files) {
+        subscriberFiles.put(subscriber, files);
+		subscriberPorts.put(subscriber, port);
+		return "OK";
+	}
+	
+	public String unSubscribe(String subscriber) {
+		if ( subscriberPorts.containsKey(subscriber) ){
+			subscriberFiles.remove(subscriber);
+			subscriberPorts.remove(subscriber);
+            return "OK";
+		}
+		return "Fail";
+	}
+	
+	public String[] getSubscribers(){
+		return subscriberFiles.keySet().toArray(new String[0]);
+	}
+	
+	public Integer getSubscriberPort(String subscriber){
+		if (subscriberPorts.containsKey(subscriber) )
+			return subscriberPorts.get(subscriber);
+		return 0;
+	}
+	
+	public String[] getSubscriberFiles(String subscriber){
+		String []toReturn = new String[subscriberFiles.get(subscriber).size()];
+		subscriberFiles.get(subscriber).toArray(toReturn);
+		return toReturn;
+	}
+}

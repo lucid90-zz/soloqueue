@@ -6,12 +6,23 @@
 
     <target name="compile">
         <mkdir dir="build/classes"/>
-        <javac srcdir="src" destdir="build/classes"/>
+        <javac srcdir="src" destdir="build/classes" >
+			<classpath>
+				<pathelement path="axis.jar"/>
+				<pathelement path="commons-discovery-0.2.jar"/>
+				<pathelement path="commons-logging-1.0.4.jar"/>
+				<pathelement path="jaxrpc.jar"/>
+			</classpath>
+		</javac>
     </target>
 
+	
+	
     <target name="jar">
         <mkdir dir="build/jar"/>
-        <jar destfile="build/jar/Soloq.jar" basedir="build/classes">
+        <jar destfile="build/jar/Soloq.jar">
+			<fileset dir="build/classes"/>
+			<zipgroupfileset dir="." includes="*.jar"/>
             <manifest>
                 <attribute name="Main-Class" value="soloq.Soloq"/>
             </manifest>
@@ -21,13 +32,13 @@
     <target name="run">
 		<parallel>
         <java jar="build/jar/Soloq.jar" fork="true">
-		<arg line="gigi 5001 5002"/>
+		<arg line="gigi"/>
 		</java>
 		<java jar="build/jar/Soloq.jar" fork="true">
-		<arg line="lucian 5000 5002"/>
+		<arg line="lucian"/>
 		</java>
 		<java jar="build/jar/Soloq.jar" fork="true">
-		<arg line="valentin 5000 5001"/>
+		<arg line="valentin"/>
 		</java>
 		</parallel>
     </target>
